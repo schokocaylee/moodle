@@ -60,6 +60,14 @@ $typeid = $lti->typeid;
 if (empty($typeid) && ($tool = lti_get_tool_by_url_match($lti->toolurl))) {
     $typeid = $tool->id;
 }
+
+$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+
+$context = context_module::instance($cm->id);
+
+require_login($course, true, $cm);
+require_capability('mod/lti:view', $context);
+
 if ($typeid) {
     $config = lti_get_type_type_config($typeid);
     if ($config->lti_ltiversion === LTI_VERSION_1P3) {
@@ -71,13 +79,6 @@ if ($typeid) {
         }
     }
 }
-
-$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-
-$context = context_module::instance($cm->id);
-
-require_login($course, true, $cm);
-require_capability('mod/lti:view', $context);
 
 // Completion and trigger events.
 if ($triggerview) {
